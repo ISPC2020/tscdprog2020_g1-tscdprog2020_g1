@@ -68,8 +68,7 @@ class Cliente:
 #creamos la clase Banco 
 class Banco:
     
-    def __init__(self):
-        self.usuarios = []
+    usuarios = []
 
     def agregar_cliente(self):
         
@@ -91,25 +90,25 @@ class Banco:
             print("\n**PRECAUCÍON ** Ya existe un usuario con el mismo DNI ** ")
             print("***********************")
         else:
-            self.usuarios.append(Cliente(nombre, apellido, dni, telefono, dirección, ciudad, codigo, mail ))
-            print(self.usuarios)
+            Banco.usuarios.append(Cliente(nombre, apellido, dni, telefono, dirección, ciudad, codigo, mail ))
+            print(Banco.usuarios)
 
     def buscar_por_dni(self, dni):
-        for usuario in self.usuarios:
+        for usuario in Banco.usuarios:
             if usuario.dni == dni:
                 return usuario
+            
     #Eliminar por dni
     def eliminar_por_dni(self, dni):
-        cont = 0
-        for usuario in self.usuarios:
+        cont=0
+        for usuario in Banco.usuarios:
             if usuario.dni == dni:
-                for usuario in self.usuarios:
-                    if cont == 7:
-                        break
-                    else:
-                        cont +=1
-                        self.usuarios.remove(usuario)
-                    print("Usuario Eliminado")
+                del Banco.usuarios[cont]
+                print("Usuario Eliminado")
+            else:
+                cont+=1
+                
+                
     def mostrar_cliente(self, dni):
         cliente = self.buscar_por_dni(dni)
         if cliente:
@@ -122,7 +121,7 @@ class Banco:
     def eliminar_cliente(self, dni):
         dni = input("Introduce el DNI del cliente\n> ")
     
-        if self.usuarios == dni:
+        if Banco.usuarios == dni:
             usuarios = clientes.pop(i)
             show(usuarios)
             #return True
