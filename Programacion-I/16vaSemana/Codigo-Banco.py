@@ -3,6 +3,7 @@
 
 import os
 import time 
+from collections import defaultdict
  
 if os.name == "posix":
     var = "clear"       
@@ -51,15 +52,25 @@ class Cliente:
                 f"Codigo Postal: {self.codigo}\n"
                 f"Mail: {self.mail}\n"
                )
-   
-    def depositar(self,monto):  #metodo para sumar un deposito al monto del cliente 
-        self.monto=self.monto+monto
+
+class funcion_cliente:
+    cuentas =  defaultdict(list)
+    def __init__(self,dni,monto):  #metodo para sumar un deposito al monto del cliente 
+        self.dni = dni
+        self.monto = monto
+        funcion_cliente.cuentas[self.dni].append(self.monto)
+        print(funcion_cliente.cuentas)
         
-    def extraer(self,monto):     #metodo para extraer y actualiza el valor de la cuenta del cliente
-        self.monto=self.monto-monto
+    def extraer(self,dni,monto):     #metodo para extraer y actualiza el valor de la cuenta del cliente
+        self.dni = dni
+        self.monto = monto
+        funcion_cliente.cuentas[self.dni].append(self.monto)
+        print(funcion_cliente.cuentas)
 
     def retornar_monto(self):     #metodo para mostar el saldo de cada cliente, me sirve para luego sumar todos los montos y sacar el dinero que tiene el banco
-        return self.monto
+        for cuentak, cuentav in funcion_cliente.cuentas.items():
+            if cuentak == self.dni:
+                return sum(cuentav)
 
     def imprimir(self):         #metodo
         print(self.dni,"tiene depositado la suma de",self.monto)
@@ -78,13 +89,13 @@ class Banco:
         apellido = input("Digite el Apellido del usuario: ")
         dni = int(input("Digite el DNI del usuario: "))
         telefono = int(input("Ingrese el Numero de telefono: "))
-        dirección = (input ("Ingresar Dirección "))
-        ciudad = (input("Ingresar Ciudad"))
-        codigo = int(input("Ingresar Codigo Postal"))
-        mail = input("Ingresar Mail")
+        dirección = (input ("Ingresar Dirección: "))
+        ciudad = (input("Ingresar Ciudad: "))
+        codigo = int(input("Ingresar Codigo Postal: "))
+        mail = input("Ingresar Mail: ")
         print("***********************","\n")
         
-        
+        #Uso if para que se verifique que no se repita el dni
         if self.buscar_por_dni(dni):
             print("***********************")
             print("\n**PRECAUCÍON ** Ya existe un usuario con el mismo DNI ** ")
@@ -92,7 +103,7 @@ class Banco:
         else:
             Banco.usuarios.append(Cliente(nombre, apellido, dni, telefono, dirección, ciudad, codigo, mail ))
             print(Banco.usuarios)
-
+    #Buscar por Dni
     def buscar_por_dni(self, dni):
         for usuario in Banco.usuarios:
             if usuario.dni == dni:
@@ -108,7 +119,7 @@ class Banco:
             else:
                 cont+=1
                 
-                
+    #mostrar Cliente           
     def mostrar_cliente(self, dni):
         cliente = self.buscar_por_dni(dni)
         if cliente:
@@ -117,15 +128,8 @@ class Banco:
             print("******************")
             print("\nNo existe un cliente con el DNI seleccionado","\n")
             print("******************")
-            
-    def eliminar_cliente(self, dni):
-        dni = input("Introduce el DNI del cliente\n> ")
+        
     
-        if Banco.usuarios == dni:
-            usuarios = clientes.pop(i)
-            show(usuarios)
-            #return True
-            
     #return False
         
         
@@ -183,6 +187,7 @@ def main():
             
             if opcion == "1":
                 banco.agregar_cliente()
+                
             elif opcion == "2":
                 dni = int(input("\nDigite el DNI del usuario que desea buscar: "))
                 print("======================================================")
@@ -200,34 +205,45 @@ def main():
             elif opcion =="4": 
                     
                     print("**********************")
-                    print(input("Ingrese su numero de DNI:"))
+                    dni = int(input("Ingrese su numero de DNI: "))
                     print("**********************","\n")
-                    deposito = float(input("Cuanto dinero desea depositar en su cuenta ->"))
-                    monto = 0
-                    saldo = monto + deposito 
-                    print("\n")
-                    print(f"El dinero se acredito correctamente - Su Saldo es: $", saldo)
-                    print("**********************")
-                    print("\n")
-                    
+                    if banco.buscar_por_dni(dni):
+                        monto = float(input("Cuanto dinero desea depositar en su cuenta ->"))
+                        f1 = funcion_cliente(dni,monto)
+                        print("\n")
+                        print(f"El dinero se acredito correctamente - Su Saldo es: $", monto)
+                        print("**********************")
+                        print("\n")
+                        print("El total de dinero en su cuenta Caja de Ahorro es: $", f1.retornar_monto())
+                        print("**********************")
+                        print("\n")
+                    else:
+                        print("**********************")
+                        print("El dni ingresado no pertenece a un cliente del banco")
+                        print("**********************")
+                        
             elif opcion =="5": 
+                print("**********************")
+                dni = int(input("Ingrese su numero de DNI: "))
+                print("**********************","\n")
+                if banco.buscar_por_dni(dni):
                     print("**********************")
                     extraer = float(input("Cuanto dinero desea extrer de su cuenta ->"))
-                    if extraer > saldo:
+                    if extraer > f1.retornar_monto():
                         print("\n")
                         print("El saldo en su cuenta es insuficiente","\n")
                     else:
-                        saldo = saldo -extraer
+                        f1.extraer(dni,(extraer*(-1)))
                         print("\n")
-                        print(f"El total de dinero en su cuenta Caja de Ahorro es: $", saldo,"\n")
+                        print("El total de dinero en su cuenta Caja de Ahorro es: $", f1.retornar_monto(),"\n")
                         print("*********************")
                         
-                #elif opcion =="6":
+            #elif opcion =="6":
             elif opcion =="7":
-                        quit()
                         print("**************************")
                         print(" *Gracias por Utilizar Nuestros Servicios* - Bancon - Tu Banco Digital")
                         print("**************************")
+                        quit()
                         
                     
         except ValueError:
